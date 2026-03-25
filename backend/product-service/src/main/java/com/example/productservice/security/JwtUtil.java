@@ -10,13 +10,15 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 public class JwtUtil {
+    private static final String JWT_KEY = "JWT_SECRET";
+
     private JwtUtil() {
         // private constructor to prevent instantiation
     }
 
     // Read secret from environment variable when available (recommended for Docker / production)
-    private static final String SECRET = (System.getenv("JWT_SECRET") != null && !System.getenv("JWT_SECRET").isBlank())
-        ? System.getenv("JWT_SECRET")
+    private static final String SECRET = (System.getenv(JWT_KEY) != null && !System.getenv(JWT_KEY).isBlank())
+        ? System.getenv(JWT_KEY)
         : "ReplaceThisWithASecureRandomSecretKeyOfSufficientLength123!";
     private static final long EXP_MS = 1000L * 60 * 60 * 24;
 
