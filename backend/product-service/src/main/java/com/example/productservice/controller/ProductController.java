@@ -25,6 +25,8 @@ import com.example.productservice.repository.ProductRepository;
 @RequestMapping("/api/products")
 public class ProductController {
     private final ProductRepository repo;
+    private static final String ERROR_KEY = "error";
+    private static final String SELLER_KEY = "ROLE_SELLER";
 
     public ProductController(ProductRepository repo) {
         this.repo = repo;
@@ -36,16 +38,16 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOne(@PathVariable String id) {
-        return repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Object> getOne(@PathVariable String id) {
+        return repo.findById(id).map(p -> ResponseEntity.ok((Object)p)).orElse(ResponseEntity.notFound().build());
     }
 
     // create product - only seller
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody ProductRequest request) {
+    public ResponseEntity<Object> create(@RequestBody ProductRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_SELLER"))) {
-            return ResponseEntity.status(403).body(Map.of("error", "Only sellers can create products"));
+        if (auth == null || auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equalsIgnoreCase(SELLER_KEY))) {
+            return ResponseEntity.status(403).body(Map.of(ERROR_KEY, "Only sellers can create products"));
         }
         String userId = auth.getName();
         Product p = new Product();
@@ -60,17 +62,17 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable String id, @RequestBody ProductRequest request) {
+    public ResponseEntity<Object> update(@PathVariable String id, @RequestBody ProductRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_SELLER"))) {
-            return ResponseEntity.status(403).body(Map.of("error", "Only sellers can update products"));
+        if (auth == null || auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equalsIgnoreCase(SELLER_KEY))) {
+            return ResponseEntity.status(403).body(Map.of(ERROR_KEY, "Only sellers can update products"));
         }
         String userId = auth.getName();
         var opt = repo.findById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         Product existing = opt.get();
         if (!userId.equals(existing.getUserId())) {
-            return ResponseEntity.status(403).body(Map.of("error", "Cannot modify another seller's product"));
+            return ResponseEntity.status(403).body(Map.of(ERROR_KEY, "Cannot modify another seller's product"));
         }
         existing.setName(request.getName());
         existing.setDescription(request.getDescription());
@@ -82,16 +84,16 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
+    public ResponseEntity<Object> delete(@PathVariable String id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_SELLER"))) {
-            return ResponseEntity.status(403).body(Map.of("error", "Only sellers can delete products"));
+        if (auth == null || auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equalsIgnoreCase(SELLER_KEY))) {
+            return ResponseEntity.status(403).body(Map.of(ERROR_KEY, "Only sellers can delete products"));
         }
         String userId = auth.getName();
         var opt = repo.findById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         Product existing = opt.get();
-        if (!userId.equals(existing.getUserId())) return ResponseEntity.status(403).body(Map.of("error", "Cannot delete another seller's product"));
+        if (!userId.equals(existing.getUserId())) return ResponseEntity.status(403).body(Map.of(ERROR_KEY, "Cannot delete another seller's product"));
         repo.deleteById(id);
         return ResponseEntity.noContent().build();
     }
@@ -100,17 +102,17 @@ public class ProductController {
     // This endpoint expects an internal token in the X-Internal-Token header and is
     // intended for trusted services (e.g., media-service) to keep data in sync.
     @PostMapping("/{id}/images")
-    public ResponseEntity<?> addImage(@PathVariable String id, @RequestBody Map<String, String> body,
+    public ResponseEntity<Object> addImage(@PathVariable String id, @RequestBody Map<String, String> body,
                                       @RequestHeader(value = "X-Internal-Token", required = false) String token) {
         String internalToken = System.getenv("INTERNAL_TOKEN");
         if (internalToken == null || !internalToken.equals(token)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Forbidden"));
+            return ResponseEntity.status(403).body(Map.of(ERROR_KEY, "Forbidden"));
         }
         var opt = repo.findById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         Product product = opt.get();
         String mediaId = body.get("mediaId");
-        if (mediaId == null || mediaId.isBlank()) return ResponseEntity.badRequest().body(Map.of("error", "mediaId required"));
+        if (mediaId == null || mediaId.isBlank()) return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "mediaId required"));
         List<String> imgs = product.getImageIds();
         if (imgs == null) imgs = new ArrayList<>();
         imgs.add(mediaId);

@@ -15,13 +15,14 @@ import java.util.Map;
 public class AuthController {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private static final String ERROR_KEY = "error";
 
     public AuthController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> body) {
         String name = body.get("name");
         String email = body.get("email");
         String password = body.get("password");
@@ -29,7 +30,7 @@ public class AuthController {
         Role role = "SELLER".equalsIgnoreCase(roleStr) ? Role.SELLER : Role.CLIENT;
 
         if (userRepository.findByEmail(email).isPresent()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Email already in use"));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Email already in use"));
         }
         String hashed = passwordEncoder.encode(password);
         User u = new User(name, email, hashed, role);
@@ -39,14 +40,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> body) {
         String email = body.get("email");
         String password = body.get("password");
         var opt = userRepository.findByEmail(email);
-        if (opt.isEmpty()) return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
+        if (opt.isEmpty()) return ResponseEntity.status(401).body(Map.of(ERROR_KEY, "Invalid credentials"));
         User u = opt.get();
         if (!passwordEncoder.matches(password, u.getPassword())) {
-            return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, "Invalid credentials"));
         }
         String token = JwtUtil.generateToken(u.getId(), u.getRole().name());
         return ResponseEntity.ok(Map.of("token", token, "userId", u.getId()));

@@ -8,6 +8,7 @@ pipeline {
     tools {
         maven 'MAVEN'
         jdk 'JDK17'
+        nodejs 'node18'
     }
 
     environment {
@@ -24,7 +25,7 @@ pipeline {
 
         stage('BACKEND - Build & Test') {
             steps {
-                sh "mvn ${env.MVN_OPTS} clean verify"
+                sh "mvn ${env.MVN_OPTS} clean verify dependency:copy-dependencies"
             }
             post {
                 always {

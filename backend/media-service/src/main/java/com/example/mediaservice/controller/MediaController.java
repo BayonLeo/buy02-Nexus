@@ -40,7 +40,7 @@ public class MediaController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<Object> upload(@RequestParam("file") MultipartFile file,
                                     @RequestParam("productId") String productId) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -136,7 +136,7 @@ public class MediaController {
     }
 
     @GetMapping("/file/{filename:.+}")
-    public ResponseEntity<?> file(@PathVariable String filename) {
+    public ResponseEntity<byte[]> file(@PathVariable String filename) {
         try {
             Path f = uploadDir.resolve(filename).normalize();
             if (!Files.exists(f)) return ResponseEntity.notFound().build();
@@ -146,7 +146,7 @@ public class MediaController {
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
                     .contentType(MediaType.parseMediaType(contentType)).body(data);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(Map.of(ERROR_KEY, "Could not read file"));
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
