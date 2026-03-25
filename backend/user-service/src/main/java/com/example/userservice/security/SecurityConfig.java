@@ -24,16 +24,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         JwtAuthFilter jwtAuthFilter = new JwtAuthFilter();
         http
-            .cors()
-            .and()
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeHttpRequests()
-            .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/actuator/**").permitAll()
-            .anyRequest().authenticated()
-            .and()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/actuator/**").permitAll()
+                    .anyRequest().authenticated()
+                )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

@@ -17,19 +17,18 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         JwtAuthFilter jwtAuthFilter = new JwtAuthFilter();
         http
-            .cors()
-            .and()
-            // CSRF protection is disabled because this is a stateless REST API using JWT tokens.
-            // CSRF attacks target cookie-based session authentication, which is not used here.
-            // Authentication is handled via JWT tokens in the Authorization header, making CSRF protection unnecessary.
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeHttpRequests()
-            .requestMatchers("/api/media/**").permitAll()
-            .requestMatchers("/actuator/**").permitAll()
-            .anyRequest().authenticated()
-            .and()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // CSRF protection is disabled because this is a stateless REST API using JWT tokens.
+                // CSRF attacks target cookie-based session authentication, which is not used here.
+                // Authentication is handled via JWT tokens in the Authorization header, making CSRF protection unnecessary.
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/products/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/media/product/**").permitAll()
+                        .anyRequest().authenticated()
+                )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
