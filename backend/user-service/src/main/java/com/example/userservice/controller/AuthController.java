@@ -21,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> body) {
         String name = body.get("name");
         String email = body.get("email");
         String password = body.get("password");
@@ -39,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> body) {
         String email = body.get("email");
         String password = body.get("password");
         var opt = userRepository.findByEmail(email);
