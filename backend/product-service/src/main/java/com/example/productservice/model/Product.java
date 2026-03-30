@@ -15,6 +15,7 @@ public class Product {
     private Integer quantity;
     private String userId; // seller id
     private List<String> imageIds; // references to Media documents
+    private String category; // for filtering
 
     public Product() {
         // default constructor for MongoDB

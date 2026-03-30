@@ -12,6 +12,7 @@ public class User {
     private String password; // hashed
     private Role role;
     private String avatar; // path or URL
+    // private Adress adress;
 
     public User() {}
 
