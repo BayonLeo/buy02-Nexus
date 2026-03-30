@@ -21,8 +21,8 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <sonar.projectKey>buy01-safe-zone-fullstack</sonar.projectKey>
-        <sonar.projectName>Buy01 Safe Zone</sonar.projectName>
+        <sonar.projectKey>Buy-02</sonar.projectKey>
+        <sonar.projectName>Buy-02</sonar.projectName>
         <sonar.aggregate>true</sonar.aggregate>
         <sonar.sources>src/main/java,${project.basedir}/frontend/src</sonar.sources>
         <sonar.tests>src/test/java,${project.basedir}/frontend/src</sonar.tests>
@@ -48,6 +48,7 @@
         <module>backend/media-service</module>
         <module>backend/product-service</module>
         <module>backend/user-service</module>
+        <module>backend/order-service</module>
     </modules>
 
     <build>
