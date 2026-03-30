@@ -2,6 +2,7 @@ package com.example.orderservice.controller;
 
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.OrderItem;
+import com.example.orderservice.model.OrderRequest;
 import com.example.orderservice.repository.OrderRepository;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +32,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createOrder(@RequestBody Order order) {
+    public ResponseEntity<Object> createOrder(@RequestBody OrderRequest order) {
         try {
             // validate order
             if (order.getUserId() == null || order.getUserId().isBlank()) {
@@ -50,7 +51,14 @@ public class OrderController {
                 }
             }
 
-            Order savedOrder = repo.save(order);
+            // Map OrderRequest -> Order entity before saving
+            Order orderEntity = new Order(order.getUserId(), order.getItems(), order.getAmount());
+            if (order.getOrderStatus() != null) orderEntity.setOrderStatus(order.getOrderStatus());
+            if (order.getPaymentMethod() != null) orderEntity.setPaymentMethod(order.getPaymentMethod());
+            if (order.getAdress() != null) orderEntity.setAdress(order.getAdress());
+            if (order.getCreatedAt() != null) orderEntity.setCreatedAt(order.getCreatedAt());
+
+            Order savedOrder = repo.save(orderEntity);
             return ResponseEntity.ok(savedOrder);
         } catch (Exception ex) {
             return ResponseEntity.status(500).body(Map.of(ERROR_KEY, SERVER_ERROR_KEY));
@@ -81,7 +89,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateOrder(@PathVariable String id, @RequestBody Order order) {
+    public ResponseEntity<Object> updateOrder(@PathVariable String id, @RequestBody OrderRequest order) {
         try {
             Optional<Order> existingOpt = repo.findById(id);
             if (existingOpt.isEmpty()) {

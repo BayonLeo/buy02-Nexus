@@ -36,4 +36,6 @@ public class Product {
     public void setUserId(String userId) { this.userId = userId; }
     public List<String> getImageIds() { return imageIds; }
     public void setImageIds(List<String> imageIds) { this.imageIds = imageIds; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 }

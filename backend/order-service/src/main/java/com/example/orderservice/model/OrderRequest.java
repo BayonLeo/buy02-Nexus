@@ -1,14 +1,9 @@
 package com.example.orderservice.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.time.LocalDateTime;
 
-@Document(collection="orders")
-public class Order {
-    @Id
-    private String id;
+public class OrderRequest {
     private String userId;
     private List<OrderItem> items;
     private double amount;
@@ -17,25 +12,8 @@ public class Order {
     private LocalDateTime createdAt;
     private Adress adress;
 
-    public Order() {
-        this.createdAt = LocalDateTime.now();
-        this.orderStatus = OrderStatus.PENDING;
-    }
-
-    public Order(String userId, List<OrderItem> items, double amount) {
-        this.userId = userId;
-        this.items = items;
-        this.amount = amount;
-        this.orderStatus = OrderStatus.PENDING;
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public OrderRequest() {
+        // default constructor for deserialization
     }
 
     public String getUserId() {
@@ -66,16 +44,16 @@ public class Order {
         return orderStatus;
     }
 
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
     public String getPaymentMethod() {
         return paymentMethod;
     }
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
-    }
-
-    public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
     }
 
     public LocalDateTime getCreatedAt() {

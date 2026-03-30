@@ -12,7 +12,7 @@ public class User {
     private String password; // hashed
     private Role role;
     private String avatar; // path or URL
-    // private Adress adress;
+    private Adress adress;
 
     public User() {}
 
@@ -36,4 +36,10 @@ public class User {
     public void setRole(Role role) { this.role = role; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
+    public Adress getAdress() {
+        return adress;
+    }
+    public void setAdress() {
+        this.adress = adress;
+    }
 }
