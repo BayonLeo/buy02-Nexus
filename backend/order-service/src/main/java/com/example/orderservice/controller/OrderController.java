@@ -3,6 +3,7 @@ package com.example.orderservice.controller;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.OrderItem;
 import com.example.orderservice.model.OrderRequest;
+import com.example.orderservice.model.OrderStatus;
 import com.example.orderservice.repository.OrderRepository;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -106,6 +107,41 @@ public class OrderController {
 
             Order saved = repo.save(existing);
             return ResponseEntity.ok(saved);
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body(Map.of(ERROR_KEY, SERVER_ERROR_KEY));
+        }
+    }
+
+    // ANNULER
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<Object> cancelOrder(@PathVariable String id) {
+        try {
+            Optional<Order> orderOpt = repo.findById(id);
+            if (orderOpt.isEmpty()) return ResponseEntity.status(404).body(Map.of(ERROR_KEY, ORDER_NOT_FOUND_KEY));
+
+            Order order = orderOpt.get();
+            order.setOrderStatus(OrderStatus.CANCELED);
+            return ResponseEntity.ok(repo.save(order));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body(Map.of(ERROR_KEY, SERVER_ERROR_KEY));
+        }
+    }
+
+    // REDO (Refaire une commande identique)
+    @PostMapping("/{id}/redo")
+    public ResponseEntity<Object> redoOrder(@PathVariable String id) {
+        try {
+            Optional<Order> originalOpt = repo.findById(id);
+            if (originalOpt.isEmpty()) return ResponseEntity.status(404).body(Map.of(ERROR_KEY, ORDER_NOT_FOUND_KEY));
+
+            Order original = originalOpt.get();
+            // On crée une nouvelle entité basée sur l'ancienne
+            Order newOrder = new Order(original.getUserId(), original.getItems(), original.getAmount());
+            newOrder.setOrderStatus(OrderStatus.PENDING); // Reset au début
+            newOrder.setPaymentMethod(original.getPaymentMethod());
+            newOrder.setAdress(original.getAdress());
+
+            return ResponseEntity.ok(repo.save(newOrder));
         } catch (Exception ex) {
             return ResponseEntity.status(500).body(Map.of(ERROR_KEY, SERVER_ERROR_KEY));
         }

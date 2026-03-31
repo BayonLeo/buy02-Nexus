@@ -1,4 +1,4 @@
-/* import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -234,4 +234,4 @@ describe('LoginComponent', () => {
     expect(passwordLabel).toBeTruthy();
     expect(passwordLabel.textContent).toContain('Password');
   });
-}); */
+});

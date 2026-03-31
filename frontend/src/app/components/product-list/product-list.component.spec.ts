@@ -1,4 +1,4 @@
-/* import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProductListComponent } from './product-list.component';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
@@ -77,4 +77,4 @@ describe('ProductListComponent', () => {
         component.onSearch('');
         expect(component.filteredProducts.length).toBe(2);
     });
-}); */
+});

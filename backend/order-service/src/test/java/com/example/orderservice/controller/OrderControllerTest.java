@@ -2,6 +2,7 @@ package com.example.orderservice.controller;
 
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.OrderItem;
+import com.example.orderservice.model.OrderStatus;
 import com.example.orderservice.repository.OrderRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -205,5 +209,41 @@ public class OrderControllerTest {
         mockMvc.perform(delete("/api/order/123"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.error").value("Internal server error"));
+    }
+
+    // TEST SHOULD CANCEL ORDER
+    @Test
+    @WithMockUser
+    void shouldCancelOrder() throws Exception {
+        Order order = new Order("user-1", List.of(), 10.0);
+        order.setId("ord-123");
+        order.setOrderStatus(OrderStatus.PENDING);
+
+        when(orderRepository.findById("ord-123")).thenReturn(Optional.of(order));
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+
+        mockMvc.perform(put("/api/order/ord-123/cancel")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderStatus").value("CANCELED"));
+    }
+
+    // TEST SHOULD REDO ORDER
+    @Test
+    @WithMockUser
+    void shouldRedoOrder() throws Exception {
+        OrderItem item = new OrderItem("p-1", "Product", "s-1", 10.0, 1);
+        Order original = new Order("user-1", List.of(item), 10.0);
+        original.setId("old-id");
+        original.setOrderStatus(OrderStatus.COMPLETED);
+
+        when(orderRepository.findById("old-id")).thenReturn(Optional.of(original));
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+
+        mockMvc.perform(post("/api/order/old-id/redo")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderStatus").value("PENDING"))
+                .andExpect(jsonPath("$.userId").value("user-1"));
     }
 }

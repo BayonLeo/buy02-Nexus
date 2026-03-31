@@ -1,4 +1,4 @@
-/* import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SellerDashboardComponent } from './seller-dashboard.component';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
@@ -127,4 +127,4 @@ describe('SellerDashboardComponent', () => {
         });
         expect(component.loadMyProducts).toHaveBeenCalled();
     });
-}); */
+});
