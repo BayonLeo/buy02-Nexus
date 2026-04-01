@@ -71,12 +71,12 @@ public class MediaController {
             if (mediaBase == null || mediaBase.isBlank()) mediaBase = "http://localhost:8083";
             String publicPath = mediaBase + "/api/media/file/" + filename;
             Media m = new Media(publicPath, productId);
-            Media savedMedia = repo.save(m);
+            repo.save(m);
 
             // best-effort notification to product-service; upload success does not depend on it
-            notifyProductServiceOfNewMedia(savedMedia, productId);
+            notifyProductServiceOfNewMedia(m, productId);
 
-            return ResponseEntity.ok(savedMedia);
+            return ResponseEntity.ok(m);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of(ERROR_KEY, "Upload failed", "detail", e.getMessage()));
         }

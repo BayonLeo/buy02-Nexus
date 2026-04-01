@@ -3,6 +3,7 @@ package com.example.mediaservice.controller;
 import com.example.mediaservice.model.Media;
 import com.example.mediaservice.repository.MediaRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -31,6 +36,14 @@ class MediaControllerTest {
     @MockBean
     private MediaRepository mediaRepository;
 
+    @BeforeEach
+    void setup() throws IOException {
+        Path testUploadDir = Paths.get("uploads");
+        if (!Files.exists(testUploadDir)) {
+            Files.createDirectories(testUploadDir);
+        }
+    }
+
     // Test if upload with seller role is successful & if is present in database
     @Test
     @WithMockUser(authorities = "ROLE_SELLER")
@@ -41,6 +54,8 @@ class MediaControllerTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 "test image content".getBytes()
         );
+
+        when(mediaRepository.save(any(Media.class))).thenAnswer(i -> i.getArguments()[0]);
 
         mockMvc.perform(multipart("/api/media/upload")
                         .file(file)
