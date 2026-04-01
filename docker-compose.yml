@@ -59,7 +59,8 @@ services:
       - buy-net
     volumes:
       # persist uploaded media files on the host so they survive container rebuilds
-      - ./backend/media-service/uploads:/app/uploads
+      # - ./backend/media-service/uploads:/app/uploads
+      - media-uploads:/app/uploads
 
   order-service:
     build: ./backend/order-service
@@ -79,6 +80,7 @@ services:
 
 volumes:
   mongo-data:
+  media-uploads:
 
 networks:
   buy-net:
