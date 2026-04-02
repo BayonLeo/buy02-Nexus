@@ -35,7 +35,7 @@ public class AuthController {
         String hashed = passwordEncoder.encode(password);
         User u = new User(name, email, hashed, role);
         userRepository.save(u);
-        String token = JwtUtil.generateToken(u.getId(), u.getRole().name());
+        String token = JwtUtil.generateToken(u.getId(), u.getRole().name(), u.getName());
         return ResponseEntity.ok(Map.of("token", token, "userId", u.getId()));
     }
 
@@ -49,7 +49,7 @@ public class AuthController {
         if (!passwordEncoder.matches(password, u.getPassword())) {
             return ResponseEntity.status(401).body(Map.of(ERROR_KEY, "Invalid credentials"));
         }
-        String token = JwtUtil.generateToken(u.getId(), u.getRole().name());
+        String token = JwtUtil.generateToken(u.getId(), u.getRole().name(), u.getName());
         return ResponseEntity.ok(Map.of("token", token, "userId", u.getId()));
     }
 }

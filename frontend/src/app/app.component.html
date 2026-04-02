@@ -5,11 +5,17 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" routerLink="/">Products</a></li>
                 <li class="nav-item"><a class="nav-link" routerLink="/seller">Seller Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/order">Order List</a></li>
             </ul>
             <ul class="navbar-nav ms-auto">
-                <ng-container *ngIf="isLoggedIn$ | async; else guestLinks">
+                <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
                     <li class="nav-item">
-                        <a class="nav-link" (click)="logout()" style="cursor: pointer">Logout</a>
+                        <span class="nav-link" style="cursor: default; font-weight: bold;">
+                            Welcome, {{ user.name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" (click)="logout()" style="cursor: pointer; color: red;">Logout</a>
                     </li>
                 </ng-container>
                 <ng-template #guestLinks>
