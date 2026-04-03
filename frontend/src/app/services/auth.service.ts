@@ -12,6 +12,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
+
   register(body: any) { return this.http.post<any>(`${this.base}/register`, body); }
   login(body: any) { return this.http.post<any>(`${this.base}/login`, body); }
 
@@ -30,6 +31,8 @@ export class AuthService {
     public currentUser$: Observable<any> = this.isLoggedIn$.pipe(
         map(isLogged => isLogged ? this.getUserData() : null)
     );
+    public isSeller$: Observable<boolean> = this.currentUser$.pipe(map(u => u?.role === 'SELLER'));
+
 
   setToken(token: string) {
       localStorage.setItem('token', token);
@@ -57,7 +60,8 @@ export class AuthService {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       console.log('Token payload:', payload); 
-      return payload.userId || payload.sub || null;
+    return payload.id || payload.userId || payload.sub || null;
+
     } catch(e) { 
       console.error('Token error:', e);
       return null; 
