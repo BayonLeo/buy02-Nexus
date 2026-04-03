@@ -86,4 +86,11 @@ class SecurityComponentsTest {
                 .andExpect(jsonPath("$.items[0].productId").value("prod-123"))
                 .andExpect(jsonPath("$.amount").value(25.0));
     }
+
+    // GET : User ne peut get les commandes que si login
+    @Test
+    void getOrderWithoutValidToken() throws Exception {
+        mockMvc.perform(get("/api/order"))
+                .andExpect(status().isForbidden());
+    }
 }
