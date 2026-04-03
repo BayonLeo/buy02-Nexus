@@ -8,9 +8,11 @@ import { AuthService} from "./services/auth.service";
 })
 export class AppComponent {
     public isLoggedIn$: Observable<boolean>;
+    public currentUser$: Observable<any>;
 
     constructor(private authService: AuthService) {
         this.isLoggedIn$ = this.authService.isLoggedIn$;
+        this.currentUser$ = this.authService.currentUser$;
     }
 
     logout(): void {

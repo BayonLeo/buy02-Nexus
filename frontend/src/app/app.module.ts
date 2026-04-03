@@ -7,6 +7,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import { OrderListComponent } from './components/order-list/order-list.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { SellerDashboardComponent } from './components/seller-dashboard/seller-dashboard.component';
 import { MediaManagerComponent } from './components/media-manager/media-manager.component';
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: '', component: ProductListComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'order', component: OrderListComponent },
   { path: 'seller', component: SellerDashboardComponent, canActivate: [AuthGuard] }
 ];
 
@@ -26,6 +28,7 @@ const routes: Routes = [
     LoginComponent,
     RegisterComponent,
     ProductListComponent,
+    OrderListComponent,
     SellerDashboardComponent,
     MediaManagerComponent
   ],

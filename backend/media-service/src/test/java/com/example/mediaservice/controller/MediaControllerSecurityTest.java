@@ -1,5 +1,8 @@
 package com.example.mediaservice.controller;
 
+import com.example.mediaservice.model.Media;
+import com.example.mediaservice.repository.MediaRepository;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -10,11 +13,11 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.example.mediaservice.repository.MediaRepository;
-
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 
 @WebMvcTest(MediaController.class)
@@ -77,6 +80,8 @@ class MediaControllerSecurityTest {
     void shouldAllowSellerRoleToUpload() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "content".getBytes());
+
+        when(mediaRepository.save(any(Media.class))).thenAnswer(i -> i.getArguments()[0]);
 
         mockMvc.perform(multipart("/api/media/upload")
                         .file(file)

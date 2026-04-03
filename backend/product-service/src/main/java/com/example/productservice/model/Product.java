@@ -15,6 +15,7 @@ public class Product {
     private Integer quantity;
     private String userId; // seller id
     private List<String> imageIds; // references to Media documents
+    private String category; // for filtering
 
     public Product() {
         // default constructor for MongoDB
@@ -35,4 +36,6 @@ public class Product {
     public void setUserId(String userId) { this.userId = userId; }
     public List<String> getImageIds() { return imageIds; }
     public void setImageIds(List<String> imageIds) { this.imageIds = imageIds; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 }

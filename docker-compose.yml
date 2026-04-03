@@ -59,11 +59,28 @@ services:
       - buy-net
     volumes:
       # persist uploaded media files on the host so they survive container rebuilds
-      - ./backend/media-service/uploads:/app/uploads
+      # - ./backend/media-service/uploads:/app/uploads
+      - media-uploads:/app/uploads
+
+  order-service:
+    build: ./backend/order-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/orderdb
+      - JWT_SECRET=ChangeThisJWTSecretToASecureValue
+      - INTERNAL_TOKEN=ChangeThisInternalToken
+    depends_on:
+      - mongo
+      - product-service
+      - user-service
+    networks:
+      - buy-net
 
 
 volumes:
   mongo-data:
+  media-uploads:
 
 networks:
   buy-net:

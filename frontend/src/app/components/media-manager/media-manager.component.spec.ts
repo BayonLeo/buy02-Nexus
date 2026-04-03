@@ -1,4 +1,4 @@
-/* import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MediaManagerComponent } from './media-manager.component';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
@@ -101,4 +101,4 @@ describe('MediaManagerComponent', () => {
         component.upload(new Event('submit'));
         expect(component.error).toBe('Login first');
     });
-}); */
+});

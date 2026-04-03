@@ -1,4 +1,4 @@
-/* import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from './register.component';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
@@ -64,4 +64,4 @@ describe('RegisterComponent', () => {
 
         expect(router.navigate).toHaveBeenCalledWith(['/']);
     });
-}); */
+});
