@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.71% </span>
+                <span class="strong">84% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>18/21</span>
+                <span class='fraction'>21/25</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>6/8</span>
+                <span class='fraction'>6/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.35% </span>
+                <span class="strong">81.81% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/17</span>
+                <span class='fraction'>18/22</span>
             </div>
         
             
@@ -121,7 +121,36 @@
 <a name='L56'></a><a href='#L56'>56</a>
 <a name='L57'></a><a href='#L57'>57</a>
 <a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,7 +180,16 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -179,9 +217,16 @@
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 import { MediaService } from '../../services/media.service';
+import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
+import { Observable } from 'rxjs';
 &nbsp;
 @Component({
   selector: 'app-product-list',
@@ -192,14 +237,19 @@ import { MediaService } from '../../services/media.service';
     &lt;/div&gt;
     &lt;div class="row g-3"&gt;
       &lt;div class="col-md-6" *ngFor="let p of filteredProducts"&gt;
-        &lt;div class="card product-card"&gt;
+        &lt;div class="card product-card h-100"&gt;
           &lt;div *ngIf="p.images &amp;&amp; p.images.length" class="card-img-top text-center" style="padding:8px;"&gt;
             &lt;img [src]="p.images[0].imagePath" alt="" style="max-width:100%;max-height:240px;object-fit:contain" /&gt;
           &lt;/div&gt;
-          &lt;div class="card-body"&gt;
+          &lt;div class="card-body d-flex flex-column"&gt;
             &lt;h5 class="card-title"&gt;{{p.name}} &lt;span class="badge bg-primary"&gt;{{p.price | currency}}&lt;/span&gt;&lt;/h5&gt;
             &lt;div class="small-id"&gt;id: {{p.id || p._id}}&lt;/div&gt;
-            &lt;p class="card-text product-description"&gt;{{p.description}}&lt;/p&gt;
+            &lt;p class="card-text product-description flex-grow-1"&gt;{{p.description}}&lt;/p&gt;
+            &lt;div class="mt-auto pt-3"&gt;
+              &lt;button *ngIf="isLoggedIn$ | async" class="btn btn-outline-primary w-100" (click)="addToCart(p)"&gt;
+                Add to Cart
+              &lt;/button&gt;
+            &lt;/div&gt;
           &lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
@@ -209,7 +259,16 @@ import { MediaService } from '../../services/media.service';
 export class ProductListComponent implements OnInit {
   products: any[] = [];
   filteredProducts: any[] = [];
-  constructor(private productService: ProductService, private media: MediaService) {}
+  isLoggedIn$: Observable&lt;boolean&gt;;
+&nbsp;
+  constructor(
+    private productService: ProductService, 
+    private media: MediaService,
+    private cartService: CartService,
+    private authService: AuthService
+  ) {
+    this.isLoggedIn$ = this.authService.isLoggedIn$;
+  }
   ngOnInit() {
     this.productService.listAll().subscribe({
       next: (data: any[]) =&gt; {
@@ -236,6 +295,10 @@ export class ProductListComponent implements OnInit {
     if (!t) { this.filteredProducts = this.products; return; }
     this.filteredProducts = this.products.filter(p =&gt; (p.name || <span class="branch-1 cbranch-no" title="branch not covered" >'')</span>.toLowerCase().includes(t) || (p.description || '').toLowerCase().includes(t));
   }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  addToCart(</span>product: any) {
+<span class="cstat-no" title="statement not covered" >    this.cartService.addToCart(product);</span>
+  }
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -244,7 +307,7 @@ export class ProductListComponent implements OnInit {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-03T09:46:02.930Z
+                at 2026-04-04T15:50:16.480Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -8,10 +8,19 @@ import { map } from 'rxjs/operators';
 export class AuthService {
   private base = 'http://localhost:8081/api/auth';
   private loggedIn = new BehaviorSubject<boolean>(!!this.getToken());
-  public isLoggedIn$: Observable<boolean> = this.loggedIn.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  // Crée un Observable qui émet les infos user dès qu'on est loggé
+  public currentUser$: Observable<any> = this.loggedIn.asObservable().pipe(
+      map(isLogged => isLogged ? this.getUserData() : null)
+  );
+
+  public isLoggedIn$: Observable<boolean> = this.currentUser$.pipe(
+      map(user => !!user)
+  );
+
+  public isSeller$: Observable<boolean> = this.currentUser$.pipe(map(u => u?.role === 'SELLER'));
 
   register(body: any) { return this.http.post<any>(`${this.base}/register`, body); }
   login(body: any) { return this.http.post<any>(`${this.base}/login`, body); }
@@ -26,12 +35,6 @@ export class AuthService {
           return null;
       }
   }
-
-    // Crée un Observable qui émet les infos user dès qu'on est loggé
-    public currentUser$: Observable<any> = this.isLoggedIn$.pipe(
-        map(isLogged => isLogged ? this.getUserData() : null)
-    );
-    public isSeller$: Observable<boolean> = this.currentUser$.pipe(map(u => u?.role === 'SELLER'));
 
 
   setToken(token: string) {

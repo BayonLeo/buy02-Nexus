@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { SellerDashboardComponent } from './seller-dashboard.component';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
@@ -30,7 +31,8 @@ describe('SellerDashboardComponent', () => {
                 { provide : ProductService, useValue: productSpy},
                 { provide : MediaService, useValue: mediaSpy},
                 // { provide: Router, useClass: class { navigate = jasmine.createSpy('navigate'); } }
-            ]
+            ],
+            schemas: [NO_ERRORS_SCHEMA]
         }).compileComponents();
 
         fixture = TestBed.createComponent(SellerDashboardComponent);

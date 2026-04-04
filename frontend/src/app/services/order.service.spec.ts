@@ -44,7 +44,7 @@ describe('OrderService', () => {
     const orderId = '1';
     service.cancelOrder(orderId).subscribe();
 
-    const req = httpMock.expectOne(`${apiUrl}/{id}/cancel`);
+    const req = httpMock.expectOne(`${apiUrl}/${orderId}/cancel`);
     expect(req.request.method).toBe('PUT');
     req.flush({});
   });
@@ -53,7 +53,7 @@ describe('OrderService', () => {
     const orderId = '1';
     service.redoOrder(orderId).subscribe();
 
-    const req = httpMock.expectOne(`${apiUrl}/{id}/redo`);
+    const req = httpMock.expectOne(`${apiUrl}/${orderId}/redo`);
     expect(req.request.method).toBe('POST');
     req.flush({});
   });
@@ -62,7 +62,7 @@ describe('OrderService', () => {
     const orderId = '1';
     service.deleteOrder(orderId).subscribe();
 
-    const req = httpMock.expectOne(`${apiUrl}/{id}`);
+    const req = httpMock.expectOne(`${apiUrl}/${orderId}`);
     expect(req.request.method).toBe('DELETE');
     req.flush({});
   });
