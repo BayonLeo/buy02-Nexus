@@ -30,6 +30,8 @@ const routes: Routes = [
   { path: 'seller', component: SellerDashboardComponent, canActivate: [SellerGuard] }
 ];
 
+// comment
+
 @NgModule({
   declarations: [
     AppComponent,
