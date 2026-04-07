@@ -4,6 +4,7 @@
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" routerLink="/">Products</a></li>
+                <li class="nav-item" *ngIf="isLoggedIn$ | async"><a class="nav-link" routerLink="/profile">Profile</a></li>
                 <li class="nav-item" *ngIf="isSeller$ | async"><a class="nav-link" routerLink="/seller">Seller Dashboard</a></li>
 
                 <li class="nav-item"><a class="nav-link" routerLink="/order">Order List</a></li>

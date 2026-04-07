@@ -10,14 +10,17 @@ import { RegisterComponent } from './components/register/register.component';
 import { OrderListComponent } from './components/order-list/order-list.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { SellerDashboardComponent } from './components/seller-dashboard/seller-dashboard.component';
+import { ProfileComponent } from './components/profile/profile.component';
 import { MediaManagerComponent } from './components/media-manager/media-manager.component';
 import { TokenInterceptor } from './services/token.interceptor';
 import { AuthGuard } from './services/auth.guard';
+import { LoggedInGuard } from './services/logged-in.guard';
 
 const routes: Routes = [
   { path: '', component: ProductListComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [LoggedInGuard] },
   { path: 'order', component: OrderListComponent },
   { path: 'seller', component: SellerDashboardComponent, canActivate: [AuthGuard] }
 ];
@@ -30,6 +33,7 @@ const routes: Routes = [
     ProductListComponent,
     OrderListComponent,
     SellerDashboardComponent,
+    ProfileComponent,
     MediaManagerComponent
   ],
   imports: [BrowserModule, HttpClientModule, FormsModule, RouterModule.forRoot(routes)],
