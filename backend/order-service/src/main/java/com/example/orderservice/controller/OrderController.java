@@ -35,36 +35,50 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Object> createOrder(@RequestBody OrderRequest order) {
         try {
-            // validate order
-            if (order.getUserId() == null || order.getUserId().isBlank()) {
-                return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Missing userId"));
-            }
-            if (order.getItems() == null || order.getItems().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Order must contain at least one item"));
+            // 1. Extraction de la validation (Réduit drastiquement le score)
+            Optional<String> validationError = validateOrder(order);
+            if (validationError.isPresent()) {
+                return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, validationError.get()));
             }
 
-            for (OrderItem item : order.getItems()) {
-                if (item.getProductId() == null || item.getProductId().isBlank()) {
-                    return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Missing productId in items"));
-                }
-                if (item.getQuantity() <= 0) {
-                    return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Item quantity must be greater than 0"));
-                }
-            }
-
-            // Map OrderRequest -> Order entity before saving
-            Order orderEntity = new Order(order.getUserId(), order.getItems(), order.getAmount());
-            if (order.getUserName() != null) orderEntity.setUserName(order.getUserName());
-            if (order.getOrderStatus() != null) orderEntity.setOrderStatus(order.getOrderStatus());
-            if (order.getPaymentMethod() != null) orderEntity.setPaymentMethod(order.getPaymentMethod());
-            if (order.getAdress() != null) orderEntity.setAdress(order.getAdress());
-            if (order.getCreatedAt() != null) orderEntity.setCreatedAt(order.getCreatedAt());
+            // 2. Extraction du mapping
+            Order orderEntity = mapToEntity(order);
 
             Order savedOrder = repo.save(orderEntity);
             return ResponseEntity.ok(savedOrder);
+
         } catch (Exception ex) {
             return ResponseEntity.status(500).body(Map.of(ERROR_KEY, SERVER_ERROR_KEY));
         }
+    }
+
+    private Optional<String> validateOrder(OrderRequest order) {
+        if (order.getUserId() == null || order.getUserId().isBlank()) {
+            return Optional.of("Missing userId");
+        }
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            return Optional.of("Order must contain at least one item");
+        }
+
+        for (OrderItem item : order.getItems()) {
+            if (item.getProductId() == null || item.getProductId().isBlank()) {
+                return Optional.of("Missing productId in items");
+            }
+            if (item.getQuantity() <= 0) {
+                return Optional.of("Item quantity must be greater than 0");
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Order mapToEntity(OrderRequest order) {
+        Order entity = new Order(order.getUserId(), order.getItems(), order.getAmount());
+        if (order.getUserName() != null) entity.setUserName(order.getUserName());
+        if (order.getOrderStatus() != null) entity.setOrderStatus(order.getOrderStatus());
+        if (order.getPaymentMethod() != null) entity.setPaymentMethod(order.getPaymentMethod());
+        if (order.getAdress() != null) entity.setAdress(order.getAdress());
+        if (order.getCreatedAt() != null) entity.setCreatedAt(order.getCreatedAt());
+        return entity;
     }
 
     @GetMapping("/{id}")
