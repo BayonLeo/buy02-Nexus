@@ -143,6 +143,21 @@ public class OrderController {
         }
     }
 
+    // COMPLETE
+    @PutMapping("/{id}/complete")
+    public ResponseEntity<Object> completeOrder(@PathVariable String id) {
+        try {
+            Optional<Order> orderOpt = repo.findById(id);
+            if (orderOpt.isEmpty()) return ResponseEntity.status(404).body(Map.of(ERROR_KEY, ORDER_NOT_FOUND_KEY));
+
+            Order order = orderOpt.get();
+            order.setOrderStatus(OrderStatus.COMPLETED);
+            return ResponseEntity.ok(repo.save(order));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body(Map.of(ERROR_KEY, SERVER_ERROR_KEY));
+        }
+    }
+
     // REDO (Refaire une commande identique)
     @PostMapping("/{id}/redo")
     public ResponseEntity<Object> redoOrder(@PathVariable String id) {

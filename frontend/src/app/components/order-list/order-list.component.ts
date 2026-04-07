@@ -42,6 +42,10 @@ import { Observable, map } from 'rxjs';
                   (click)="onCancel(order.id)"
                   class="btn btn-sm btn-outline-warning me-1">❌ Cancel</button>
 
+          <button *ngIf="order.orderStatus === 'PENDING'"
+                  (click)="onComplete(order.id)"
+                  class="btn btn-sm btn-outline-success me-1">✅ Complete</button>
+
           <button (click)="onDelete(order.id)" class="btn btn-sm btn-link text-danger">Delete</button>
         </td>
       </tr>
@@ -96,6 +100,17 @@ export class OrderListComponent implements OnInit {
       },
       error: (err) => {
         this.errorMessage = err.error?.error || 'Failed to redo order';
+      }
+    });
+  }
+
+  onComplete(orderId: string) {
+    this.orderService.completeOrder(orderId).subscribe({
+      next: () => {
+        this.loadOrders();
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Failed to complete order';
       }
     });
   }
