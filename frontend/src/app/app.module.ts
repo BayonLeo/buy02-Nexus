@@ -17,6 +17,7 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
 import { TokenInterceptor } from './services/token.interceptor';
 import { AuthGuard } from './services/auth.guard';
 import { SellerGuard } from './services/seller.guard';
+import { LoggedInGuard } from './services/logged-in.guard';
 
 const routes: Routes = [
   { path: '', component: ProductListComponent },
