@@ -140,6 +140,7 @@ public class OrderController {
             // On crée une nouvelle entité basée sur l'ancienne
             Order newOrder = new Order(original.getUserId(), original.getItems(), original.getAmount());
             newOrder.setOrderStatus(OrderStatus.PENDING); // Reset au début
+            newOrder.setUserName(original.getUserName());
             newOrder.setPaymentMethod(original.getPaymentMethod());
             newOrder.setAdress(original.getAdress());
 

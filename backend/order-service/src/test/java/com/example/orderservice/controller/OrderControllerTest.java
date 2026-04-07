@@ -27,7 +27,7 @@ import java.util.Optional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@WithMockUser
+@WithMockUser(roles = "CLIENT")
 public class OrderControllerTest {
 
     @Autowired

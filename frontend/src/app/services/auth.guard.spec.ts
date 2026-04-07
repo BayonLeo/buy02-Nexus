@@ -6,8 +6,8 @@ import { AuthService } from './auth.service';
 
 // Mocks
 class MockAuthService {
-  isSeller(): boolean {
-    return false;
+  getToken(): string | null {
+    return null;
   }
 }
 
@@ -39,9 +39,9 @@ describe('AuthGuard', () => {
     expect(guard).toBeTruthy();
   });
 
-  describe('when user is a seller', () => {
+  describe('when user is logged in', () => {
     beforeEach(() => {
-      spyOn(authService, 'isSeller').and.returnValue(true);
+      spyOn(authService, 'getToken').and.returnValue('some-token');
     });
 
     it('should return true and allow navigation', () => {
@@ -52,9 +52,9 @@ describe('AuthGuard', () => {
     });
   });
 
-  describe('when user is NOT a seller', () => {
+  describe('when user is NOT logged in', () => {
     beforeEach(() => {
-      spyOn(authService, 'isSeller').and.returnValue(false);
+      spyOn(authService, 'getToken').and.returnValue(null);
     });
 
     it('should return false and redirect to login', () => {

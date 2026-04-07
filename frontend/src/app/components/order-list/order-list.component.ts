@@ -23,7 +23,7 @@ import { Observable, map } from 'rxjs';
     <tbody>
       <tr *ngFor="let order of orders">
         <td><small class="text-muted">{{ order.id }}</small></td>
-        <td>{{ order.userName || order.userId }}</td>
+        <td>{{ order.userName }}</td>
         <td>{{ order.createdAt | date:'short' }}</td>
         <td>{{ order.amount | currency }}</td>
         <td>
