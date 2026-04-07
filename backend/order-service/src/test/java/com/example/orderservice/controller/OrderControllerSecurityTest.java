@@ -24,7 +24,7 @@ import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class SecurityComponentsTest {
+class OrderControllerSecurityTest {
     // MockMvc to simulate HTTP requests
     @Autowired
     private MockMvc mockMvc;
@@ -72,7 +72,7 @@ class SecurityComponentsTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "CLIENT")
     void postOrderWithValidToken() throws Exception {
         String orderJson = "{ \"userId\": \"user-123\", \"items\": [{ \"productId\": \"prod-123\", \"productName\": \"Test Product\", \"sellerId\": \"seller-1\", \"price\": 12.5, \"quantity\": 2 }], \"amount\": 25.0 }";
 

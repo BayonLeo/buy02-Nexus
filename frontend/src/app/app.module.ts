@@ -12,9 +12,11 @@ import { ProductListComponent } from './components/product-list/product-list.com
 import { SellerDashboardComponent } from './components/seller-dashboard/seller-dashboard.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { MediaManagerComponent } from './components/media-manager/media-manager.component';
+import { CartComponent } from './components/cart/cart.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
 import { TokenInterceptor } from './services/token.interceptor';
 import { AuthGuard } from './services/auth.guard';
-import { LoggedInGuard } from './services/logged-in.guard';
+import { SellerGuard } from './services/seller.guard';
 
 const routes: Routes = [
   { path: '', component: ProductListComponent },
@@ -22,7 +24,9 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [LoggedInGuard] },
   { path: 'order', component: OrderListComponent },
-  { path: 'seller', component: SellerDashboardComponent, canActivate: [AuthGuard] }
+  { path: 'cart', component: CartComponent },
+  { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
+  { path: 'seller', component: SellerDashboardComponent, canActivate: [SellerGuard] }
 ];
 
 @NgModule({
@@ -33,8 +37,9 @@ const routes: Routes = [
     ProductListComponent,
     OrderListComponent,
     SellerDashboardComponent,
-    ProfileComponent,
-    MediaManagerComponent
+    MediaManagerComponent,
+    CartComponent,
+    CheckoutComponent
   ],
   imports: [BrowserModule, HttpClientModule, FormsModule, RouterModule.forRoot(routes)],
   providers: [
