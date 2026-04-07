@@ -109,7 +109,10 @@ describe('AuthService', () => {
       expect(localStorage.setItem).toHaveBeenCalledWith('token', 'new-jwt-token');
     });
 
-    it('should update loggedIn BehaviorSubject to true', (done) => {
+    it('should update isLoggedIn$ to true when token is valid', (done) => {
+      const payload = btoa(JSON.stringify({ userId: '123' }));
+      const validToken = `header.${payload}.signature`;
+
       service.isLoggedIn$.subscribe(isLoggedIn => {
         if (isLoggedIn) {
           expect(isLoggedIn).toBeTrue();
@@ -117,11 +120,11 @@ describe('AuthService', () => {
         }
       });
 
-      service.setToken('new-token');
+      service.setToken(validToken);
     });
   });
 
-  // Test 3: Register
+  // Test 4: Register
   describe('register', () => {
     it('should send POST request to register endpoint', () => {
       const userData = {
@@ -157,54 +160,41 @@ describe('AuthService', () => {
       expect(localStorageMock['token']).toBeUndefined();
     });
 
-    it('should update loggedIn BehaviorSubject to false', (done) => {
-      // Simuler un login
-      service.setToken('token');
+    it('should update isLoggedIn$ to false', (done) => {
+      // Simuler un login avec un token valide
+      const payload = btoa(JSON.stringify({ userId: '123' }));
+      const validToken = `header.${payload}.signature`;
+      service.setToken(validToken);
 
-       // Réinitialiser les appels
-          (localStorage.setItem as jasmine.Spy).calls.reset();
+      // Réinitialiser les appels
+      (localStorage.setItem as jasmine.Spy).calls.reset();
 
-          // S'abonner à l'observable
-          const subscription = service.isLoggedIn$.subscribe({
-            next: (isLoggedIn) => {
-              // On s'attend à recevoir false après logout
-              if (!isLoggedIn) {
-                expect(isLoggedIn).toBeFalse();
-                subscription.unsubscribe(); // Important: se désabonner
-                done();
-              }
-            },
-            error: (err) => {
-              fail(`Should not error: ${err}`);
-              done();
+      // S'abonner à l'observable
+      let subscription: any;
+      subscription = service.isLoggedIn$.subscribe({
+        next: (isLoggedIn) => {
+          // On s'attend à recevoir false après logout
+          if (!isLoggedIn) {
+            expect(isLoggedIn).toBeFalse();
+            if (subscription) {
+              subscription.unsubscribe();
             }
-          });
-
-          service.logout();
-        });
-    it('should navigate to login page', () => {
-      service.logout();
-
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
-    });
-  });
-
-  // Test 5: setToken
-  describe('setToken', () => {
-    it('should store token in localStorage', () => {
-      service.setToken('new-jwt-token');
-
-      expect(localStorage.setItem).toHaveBeenCalledWith('token', 'new-jwt-token');
-    });
-
-    it('should update loggedIn BehaviorSubject to true', (done) => {
-      service.isLoggedIn$.subscribe(isLoggedIn => {
-        if (isLoggedIn) {
+            done();
+          }
+        },
+        error: (err) => {
+          fail(`Should not error: ${err}`);
           done();
         }
       });
 
-      service.setToken('new-token');
+      service.logout();
+    });
+
+    it('should navigate to login page', () => {
+      service.logout();
+
+      expect(router.navigate).toHaveBeenCalledWith(['/login']);
     });
   });
 

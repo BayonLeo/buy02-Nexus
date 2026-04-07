@@ -6,7 +6,15 @@
                 <li class="nav-item"><a class="nav-link" routerLink="/">Products</a></li>
                 <li class="nav-item" *ngIf="isSeller$ | async"><a class="nav-link" routerLink="/seller">Seller Dashboard</a></li>
 
-                <li class="nav-item"><a class="nav-link" routerLink="/order">Order List</a></li>
+                <li class="nav-item" *ngIf="isLoggedIn$ | async"><a class="nav-link" routerLink="/order">Order List</a></li>
+                <li class="nav-item" *ngIf="isLoggedIn$ | async">
+                    <a class="nav-link position-relative" routerLink="/cart">
+                        Cart
+                        <span *ngIf="(cartCount$ | async) !== 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ cartCount$ | async }}
+                        </span>
+                    </a>
+                </li>
             </ul>
             <ul class="navbar-nav ms-auto">
                 <ng-container *ngIf="currentUser$ | async as user; else guestLinks">

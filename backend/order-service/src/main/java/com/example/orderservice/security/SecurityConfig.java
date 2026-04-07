@@ -2,6 +2,7 @@ package com.example.orderservice.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -27,6 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/products/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/media/product/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/order").hasAnyRole("CLIENT", "SELLER")
                         .requestMatchers("/api/order/**").authenticated()
                         .anyRequest().authenticated()
                 )

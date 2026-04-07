@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public class OrderRequest {
     private String userId;
+    private String userName;
     private List<OrderItem> items;
     private double amount;
     private OrderStatus orderStatus;
@@ -22,6 +23,14 @@ public class OrderRequest {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public List<OrderItem> getItems() {

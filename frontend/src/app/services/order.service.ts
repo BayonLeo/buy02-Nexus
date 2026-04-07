@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = '/api/order';
+  private apiUrl = 'http://localhost:8084/api/order';
 
   constructor(private http: HttpClient) { }
 
@@ -15,18 +15,28 @@ export class OrderService {
     return this.http.get<any[]>(this.apiUrl);
   }
 
+  // Create a new order
+  createOrder(order: any): Observable<any> {
+    return this.http.post(this.apiUrl, order);
+  }
+
   // Cancel an order
   cancelOrder(orderId: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/{id}/cancel`, {});
+    return this.http.put(`${this.apiUrl}/${orderId}/cancel`, {});
   }
 
   // Redo an order
-    redoOrder(orderId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/{id}/redo`, {});
+  redoOrder(orderId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${orderId}/redo`, {});
+  }
+
+  // Complete an order
+  completeOrder(orderId: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${orderId}/complete`, {});
   }
 
   // Delete an order
   deleteOrder(orderId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/{id}`);
+    return this.http.delete(`${this.apiUrl}/${orderId}`);
   }
 }
