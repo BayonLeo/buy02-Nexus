@@ -54,6 +54,7 @@ public class OrderController {
 
             // Map OrderRequest -> Order entity before saving
             Order orderEntity = new Order(order.getUserId(), order.getItems(), order.getAmount());
+            if (order.getUserName() != null) orderEntity.setUserName(order.getUserName());
             if (order.getOrderStatus() != null) orderEntity.setOrderStatus(order.getOrderStatus());
             if (order.getPaymentMethod() != null) orderEntity.setPaymentMethod(order.getPaymentMethod());
             if (order.getAdress() != null) orderEntity.setAdress(order.getAdress());
@@ -99,6 +100,7 @@ public class OrderController {
 
             Order existing = existingOpt.get();
             if (order.getUserId() != null) existing.setUserId(order.getUserId());
+            if (order.getUserName() != null) existing.setUserName(order.getUserName());
             if (order.getItems() != null) existing.setItems(order.getItems());
             existing.setAmount(order.getAmount());
             if (order.getOrderStatus() != null) existing.setOrderStatus(order.getOrderStatus());

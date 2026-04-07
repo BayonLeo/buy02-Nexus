@@ -1,5 +1,7 @@
 import { OrderService } from './../../services/order.service';
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from './../../services/auth.service';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-order-list',
@@ -10,31 +12,35 @@ import { Component, OnInit } from '@angular/core';
   <table class="table">
     <thead>
       <tr>
+        <th>Order ID</th>
+        <th>Client</th>
         <th>Date</th>
         <th>Amount</th>
         <th>Status</th>
-        <th>Actions</th>
+        <th *ngIf="isSeller$ | async">Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let order of orders">
+        <td><small class="text-muted">{{ order.id }}</small></td>
+        <td>{{ order.userName || order.userId }}</td>
         <td>{{ order.createdAt | date:'short' }}</td>
         <td>{{ order.amount | currency }}</td>
         <td>
           <span [ngClass]="{
-            'badge-warning': order.orderStatus === 'PENDING',
-            'badge-danger': order.orderStatus === 'CANCELED',
-            'badge-success': order.orderStatus === 'COMPLETED'
+            'bg-warning text-dark': order.orderStatus === 'PENDING',
+            'bg-danger': order.orderStatus === 'CANCELED',
+            'bg-success': order.orderStatus === 'COMPLETED'
           }" class="badge">
             {{ order.orderStatus }}
           </span>
         </td>
-        <td>
-          <button (click)="onRedo(order.id)" class="btn btn-sm btn-outline-primary">🔄 Refaire</button>
+        <td *ngIf="isSeller$ | async">
+          <button (click)="onRedo(order.id)" class="btn btn-sm btn-outline-primary me-1">🔄 Redo</button>
 
           <button *ngIf="order.orderStatus === 'PENDING'"
                   (click)="onCancel(order.id)"
-                  class="btn btn-sm btn-outline-warning">❌ Cancel</button>
+                  class="btn btn-sm btn-outline-warning me-1">❌ Cancel</button>
 
           <button (click)="onDelete(order.id)" class="btn btn-sm btn-link text-danger">Delete</button>
         </td>
@@ -46,8 +52,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class OrderListComponent implements OnInit {
   orders: any[] = [];
+  isSeller$: Observable<boolean>;
 
-  constructor(private orderService: OrderService) {}
+  constructor(private orderService: OrderService, private authService: AuthService) {
+    this.isSeller$ = this.authService.currentUser$.pipe(
+      map(u => u?.role === 'SELLER')
+    );
+  }
 
   ngOnInit() {
     if (localStorage.getItem('token')) { // check logged in

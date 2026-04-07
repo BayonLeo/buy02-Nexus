@@ -4,6 +4,7 @@ import { MediaService } from '../../services/media.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-list',
@@ -37,6 +38,7 @@ export class ProductListComponent implements OnInit {
   products: any[] = [];
   filteredProducts: any[] = [];
   isLoggedIn$: Observable<boolean>;
+  isClient$: Observable<boolean>;
 
   constructor(
     private productService: ProductService, 
@@ -45,6 +47,9 @@ export class ProductListComponent implements OnInit {
     private authService: AuthService
   ) {
     this.isLoggedIn$ = this.authService.isLoggedIn$;
+    this.isClient$ = this.authService.currentUser$.pipe(
+      map(u => u?.role === 'CLIENT')
+    );
   }
   ngOnInit() {
     this.productService.listAll().subscribe({

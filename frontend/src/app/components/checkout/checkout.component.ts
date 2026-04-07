@@ -109,9 +109,20 @@ export class CheckoutComponent implements OnInit {
       return;
     }
 
+    const userData = this.authService.getUserData();
+    const userName = userData?.name || 'Guest';
+
+    const zip = Number(this.address.zipCode);
+    if (isNaN(zip)) {
+      alert('Invalid Zip Code. Please enter a number.');
+      this.isPlacing = false;
+      return;
+    }
+
     this.isPlacing = true;
     const orderRequest = {
       userId: userId,
+      userName: userName,
       items: this.cartItems.map(item => ({
         productId: item.productId,
         productName: item.productName,
@@ -121,7 +132,10 @@ export class CheckoutComponent implements OnInit {
       })),
       amount: this.total,
       paymentMethod: this.paymentMethod,
-      adress: this.address
+      adress: {
+        ...this.address,
+        zipCode: zip
+      }
     };
 
     this.orderService.createOrder(orderRequest).subscribe({
@@ -132,7 +146,8 @@ export class CheckoutComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error placing order:', err);
-        alert('Failed to place order. Please try again.');
+        const errorMsg = err.error?.error || err.error?.message || err.message || 'Unknown error';
+        alert('Failed to place order: ' + errorMsg);
         this.isPlacing = false;
       }
     });

@@ -5,7 +5,7 @@ import { OrderService } from './order.service';
 describe('OrderService', () => {
   let service: OrderService;
   let httpMock: HttpTestingController;
-  const apiUrl = '/api/order';
+  const apiUrl = 'http://localhost:8084/api/order';
 
   beforeEach(() => {
     TestBed.configureTestingModule({

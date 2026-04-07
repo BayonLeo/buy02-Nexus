@@ -15,6 +15,7 @@ import { CartComponent } from './components/cart/cart.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { TokenInterceptor } from './services/token.interceptor';
 import { AuthGuard } from './services/auth.guard';
+import { SellerGuard } from './services/seller.guard';
 
 const routes: Routes = [
   { path: '', component: ProductListComponent },
@@ -23,7 +24,7 @@ const routes: Routes = [
   { path: 'order', component: OrderListComponent },
   { path: 'cart', component: CartComponent },
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
-  { path: 'seller', component: SellerDashboardComponent, canActivate: [AuthGuard] }
+  { path: 'seller', component: SellerDashboardComponent, canActivate: [SellerGuard] }
 ];
 
 @NgModule({

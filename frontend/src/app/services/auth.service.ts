@@ -36,7 +36,6 @@ export class AuthService {
       }
   }
 
-
   setToken(token: string) {
       localStorage.setItem('token', token);
       this.loggedIn.next(true);
@@ -57,13 +56,21 @@ export class AuthService {
     } catch { return false; }
   }
 
+  isClient(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload?.role === 'CLIENT';
+    } catch { return false; }
+  }
+
   getUserId(): string | null {
     const token = this.getToken();
     if (!token) return null;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      console.log('Token payload:', payload); 
-    return payload.id || payload.userId || payload.sub || null;
+      return payload.id || payload.userId || payload.sub || null;
 
     } catch(e) { 
       console.error('Token error:', e);

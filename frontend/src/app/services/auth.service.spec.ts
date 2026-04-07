@@ -101,7 +101,7 @@ describe('AuthService', () => {
     });
   });
 
-  // Test 3: setToken
+  // Test 3: tests pour setToken
   describe('setToken', () => {
     it('should store token in localStorage', () => {
       service.setToken('new-jwt-token');
@@ -148,7 +148,7 @@ describe('AuthService', () => {
     });
   });
 
-  // Test 5: Logout
+  // Test 4: Logout
   describe('logout', () => {
     it('should remove token from localStorage', () => {
       // Simuler un token existant
