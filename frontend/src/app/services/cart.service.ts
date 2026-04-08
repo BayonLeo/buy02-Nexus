@@ -39,7 +39,7 @@ export class CartService {
         price: product.price,
         quantity: 1,
         image: product.images && product.images.length ? product.images[0].imagePath : null,
-        sellerId: product.sellerId
+        sellerId: product.sellerId || product.userId
       });
     }
     this.saveCart();

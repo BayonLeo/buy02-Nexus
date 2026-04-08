@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { OrderService } from '../../services/order.service';
+import { ProductService } from '../../services/product.service';
 
 interface ProductSummary {
   key: string;
@@ -119,7 +120,7 @@ interface ProductSummary {
             <div>
               <div class="eyebrow">Seller summary</div>
               <h4 class="mb-1">Best-selling products and earnings</h4>
-              <p class="text-muted mb-0">Seller metrics are calculated from the products inside matching orders.</p>
+              <p class="text-muted mb-0">Seller sales include pending orders; earnings only count completed orders.</p>
             </div>
             <div class="text-muted small">Total earned: {{ totalEarned | currency }}</div>
           </div>
@@ -154,6 +155,10 @@ interface ProductSummary {
                 </ng-container>
               </div>
             </div>
+          </div>
+
+          <div class="alert alert-warning mt-3 mb-0 small" *ngIf="sellerTopProducts.length && totalEarned === 0">
+            Sales are present, but none are completed yet. Use the Order List to complete them before earnings will appear.
           </div>
         </div>
       </div>
@@ -236,14 +241,20 @@ export class ProfileComponent implements OnInit {
   role = 'CLIENT';
   roleLabel = 'Client';
   userOrders: any[] = [];
+  allProducts: any[] = [];
   buyerTopProducts: ProductSummary[] = [];
   buyerBestProducts: ProductSummary[] = [];
   sellerTopProducts: ProductSummary[] = [];
   sellerBestProducts: ProductSummary[] = [];
+  sellerPendingProducts: ProductSummary[] = [];
   totalSpent = 0;
   totalEarned = 0;
 
-  constructor(private auth: AuthService, private orderService: OrderService) {}
+  constructor(
+    private auth: AuthService,
+    private orderService: OrderService,
+    private productService: ProductService
+  ) {}
 
   ngOnInit(): void {
     const user = this.auth.getUserData();
@@ -252,8 +263,9 @@ export class ProfileComponent implements OnInit {
     this.role = user?.role || 'CLIENT';
     this.roleLabel = this.role === 'SELLER' ? 'Seller' : 'Client';
 
-    forkJoin({ orders: this.orderService.getOrders() }).subscribe({
-      next: ({ orders }) => {
+    forkJoin({ orders: this.orderService.getOrders(), products: this.productService.listAll() }).subscribe({
+      next: ({ orders, products }) => {
+        this.allProducts = products || [];
         this.userOrders = (orders || []).filter((order: any) => order.userId === this.currentUserId);
         this.totalSpent = this.userOrders.reduce((sum, order: any) => sum + this.toNumber(order.amount), 0);
         this.buyerTopProducts = this.buildBuyerSummaries(this.userOrders)
@@ -263,14 +275,21 @@ export class ProfileComponent implements OnInit {
           .sort((left, right) => right.revenue - left.revenue || right.quantity - left.quantity)
           .slice(0, 5);
 
-        const sellerProducts = this.buildSellerSummaries(orders || []);
+        const sellerRelevantOrders = (orders || []).filter((order: any) => this.isSellerRelevantOrder(order));
+        const sellerCompletedOrders = sellerRelevantOrders.filter((order: any) => this.isCompletedOrder(order));
+        const sellerPendingOrders = sellerRelevantOrders.filter((order: any) => !this.isCompletedOrder(order));
+
+        const sellerProducts = this.buildSellerSummaries(sellerRelevantOrders, this.allProducts);
+        const sellerCompletedProducts = this.buildSellerSummaries(sellerCompletedOrders, this.allProducts);
+        this.sellerPendingProducts = this.buildSellerSummaries(sellerPendingOrders, this.allProducts);
+
         this.sellerTopProducts = sellerProducts
           .sort((left, right) => right.quantity - left.quantity || right.revenue - left.revenue)
           .slice(0, 5);
-        this.sellerBestProducts = [...sellerProducts]
+        this.sellerBestProducts = sellerCompletedProducts.length ? [...sellerCompletedProducts] : [...sellerProducts]
           .sort((left, right) => right.revenue - left.revenue || right.quantity - left.quantity)
           .slice(0, 5);
-        this.totalEarned = sellerProducts.reduce((sum, product) => sum + product.revenue, 0);
+        this.totalEarned = sellerCompletedProducts.reduce((sum, product) => sum + product.revenue, 0);
         this.loading = false;
       },
       error: () => {
@@ -309,12 +328,22 @@ export class ProfileComponent implements OnInit {
     return Array.from(summaries.values());
   }
 
-  private buildSellerSummaries(orders: any[]): ProductSummary[] {
+  private buildSellerSummaries(orders: any[], products: any[]): ProductSummary[] {
     const summaries = new Map<string, ProductSummary>();
+    const productSellerMap = new Map<string, string>();
+
+    for (const product of products || []) {
+      const key = product.id || product._id;
+      const sellerId = product.userId || product.sellerId;
+      if (key && sellerId) {
+        productSellerMap.set(key, sellerId);
+      }
+    }
 
     for (const order of orders) {
       for (const item of order?.items || []) {
-        if (item.sellerId !== this.currentUserId) continue;
+        const sellerId = item.sellerId || productSellerMap.get(item.productId);
+        if (sellerId !== this.currentUserId) continue;
 
         const key = item.productId || item.productName;
         if (!key) continue;
@@ -332,6 +361,19 @@ export class ProfileComponent implements OnInit {
     }
 
     return Array.from(summaries.values());
+  }
+
+  private isSellerRelevantOrder(order: any): boolean {
+    const status = this.normalizeOrderStatus(order?.orderStatus);
+    return status !== 'CANCELED';
+  }
+
+  private isCompletedOrder(order: any): boolean {
+    return this.normalizeOrderStatus(order?.orderStatus) === 'COMPLETED';
+  }
+
+  private normalizeOrderStatus(status: unknown): string {
+    return String(status || '').toUpperCase();
   }
 
   private toNumber(value: unknown): number {

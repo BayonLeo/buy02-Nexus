@@ -40,6 +40,7 @@ const routes: Routes = [
     ProductListComponent,
     OrderListComponent,
     SellerDashboardComponent,
+    ProfileComponent,
     MediaManagerComponent,
     CartComponent,
     CheckoutComponent
