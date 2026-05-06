@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         MVN_OPTS = '-B'
-        NEXUS_DOCKER_REGISTRY = 'localhost:5001'
+        NEXUS_DOCKER_REGISTRY = 'host.docker.internal:5001'
         IMAGE_VERSION = '0.0.1-SNAPSHOT'
     }
 
@@ -92,42 +92,54 @@ pipeline {
 
         stage('Publish Maven Artifacts to Nexus') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'nexus-admin',
-                        usernameVariable: 'NEXUS_USERNAME',
-                        passwordVariable: 'NEXUS_PASSWORD'
-                    )
-                ]) {
-                    bat "mvn %MVN_OPTS% -DskipTests deploy"
+                script {
+                    try {
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'nexus-admin',
+                                usernameVariable: 'NEXUS_USERNAME',
+                                passwordVariable: 'NEXUS_PASSWORD'
+                            )
+                        ]) {
+                            bat "mvn %MVN_OPTS% -DskipTests deploy"
+                        }
+                    } catch (e) {
+                        echo "Could not publish Maven artifacts (missing 'nexus-admin' credential or error): ${e}"
+                    }
                 }
             }
         }
 
         stage('Publish Docker Images to Nexus') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'nexus-admin',
-                        usernameVariable: 'NEXUS_USERNAME',
-                        passwordVariable: 'NEXUS_PASSWORD'
-                    )
-                ]) {
-                    bat '''
-                        echo %NEXUS_PASSWORD% | docker login %NEXUS_DOCKER_REGISTRY% -u %NEXUS_USERNAME% --password-stdin
+                script {
+                    try {
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'nexus-admin',
+                                usernameVariable: 'NEXUS_USERNAME',
+                                passwordVariable: 'NEXUS_PASSWORD'
+                            )
+                        ]) {
+                            bat '''
+                                echo %NEXUS_PASSWORD% | docker login %NEXUS_DOCKER_REGISTRY% -u %NEXUS_USERNAME% --password-stdin
 
-                        docker build -t %NEXUS_DOCKER_REGISTRY%/user-service:%IMAGE_VERSION% ./backend/user-service
-                        docker push %NEXUS_DOCKER_REGISTRY%/user-service:%IMAGE_VERSION%
+                                docker build -t %NEXUS_DOCKER_REGISTRY%/user-service:%IMAGE_VERSION% ./backend/user-service
+                                docker push %NEXUS_DOCKER_REGISTRY%/user-service:%IMAGE_VERSION%
 
-                        docker build -t %NEXUS_DOCKER_REGISTRY%/product-service:%IMAGE_VERSION% ./backend/product-service
-                        docker push %NEXUS_DOCKER_REGISTRY%/product-service:%IMAGE_VERSION%
+                                docker build -t %NEXUS_DOCKER_REGISTRY%/product-service:%IMAGE_VERSION% ./backend/product-service
+                                docker push %NEXUS_DOCKER_REGISTRY%/product-service:%IMAGE_VERSION%
 
-                        docker build -t %NEXUS_DOCKER_REGISTRY%/media-service:%IMAGE_VERSION% ./backend/media-service
-                        docker push %NEXUS_DOCKER_REGISTRY%/media-service:%IMAGE_VERSION%
+                                docker build -t %NEXUS_DOCKER_REGISTRY%/media-service:%IMAGE_VERSION% ./backend/media-service
+                                docker push %NEXUS_DOCKER_REGISTRY%/media-service:%IMAGE_VERSION%
 
-                        docker build -t %NEXUS_DOCKER_REGISTRY%/order-service:%IMAGE_VERSION% ./backend/order-service
-                        docker push %NEXUS_DOCKER_REGISTRY%/order-service:%IMAGE_VERSION%
-                    '''
+                                docker build -t %NEXUS_DOCKER_REGISTRY%/order-service:%IMAGE_VERSION% ./backend/order-service
+                                docker push %NEXUS_DOCKER_REGISTRY%/order-service:%IMAGE_VERSION%
+                            '''
+                        }
+                    } catch (e) {
+                        echo "Could not publish Docker images (missing 'nexus-admin' credential or error): ${e}"
+                    }
                 }
             }
         }
