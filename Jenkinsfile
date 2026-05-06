@@ -5,12 +5,6 @@ pipeline {
         pollSCM('* * * * *') // cherche push toute les minutes
     }
 
-    tools {
-        maven 'MAVEN'
-        jdk 'JDK17'
-        nodejs 'node18'
-    }
-
     environment {
         MVN_OPTS = '-B'
         HOME = '/tmp/jenkins-home'
