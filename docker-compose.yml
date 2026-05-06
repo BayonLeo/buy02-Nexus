@@ -20,7 +20,7 @@ services:
   user-service:
     build: ./backend/user-service
     ports:
-      - "8081:8081"
+      - "8085:8081"
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/userdb
       - JWT_SECRET=ChangeThisJWTSecretToASecureValue
