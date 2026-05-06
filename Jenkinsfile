@@ -18,6 +18,16 @@ pipeline {
             }
         }
 
+        stage('Start MongoDB') {
+            steps {
+                bat '''
+                    docker rm -f buy02-mongo >nul 2>nul
+                    docker run -d --name buy02-mongo -p 27017:27017 mongo:6.0
+                    powershell -NoProfile -Command "$ready = $false; for ($i = 0; $i -lt 30; $i++) { try { $client = New-Object Net.Sockets.TcpClient('localhost', 27017); $client.Close(); $ready = $true; break } catch { Start-Sleep -Seconds 2 } }; if (-not $ready) { exit 1 }"
+                '''
+            }
+        }
+
         stage('BACKEND - Build & Test') {
             steps {
                 bat "mvn %MVN_OPTS% clean verify dependency:copy-dependencies"
@@ -127,6 +137,10 @@ pipeline {
 
         failure {
             echo "❌ Build échoué!"
+        }
+
+        always {
+            bat 'docker rm -f buy02-mongo >nul 2>nul || exit /b 0'
         }
     }
 }
