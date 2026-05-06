@@ -7,7 +7,6 @@ pipeline {
 
     environment {
         MVN_OPTS = '-B'
-        HOME = '/tmp/jenkins-home'
         NEXUS_DOCKER_REGISTRY = 'localhost:5001'
         IMAGE_VERSION = '0.0.1-SNAPSHOT'
     }
@@ -21,7 +20,7 @@ pipeline {
 
         stage('BACKEND - Build & Test') {
             steps {
-                sh "mvn ${env.MVN_OPTS} clean verify dependency:copy-dependencies"
+                bat "mvn %MVN_OPTS% clean verify dependency:copy-dependencies"
             }
             post {
                 always {
@@ -34,8 +33,9 @@ pipeline {
         stage('Frontend - Build & Test') {
             steps {
                 dir('frontend') {
-                    sh '''
-                        export HOME=/tmp/jenkins-home
+                    bat '''
+                        if not exist "%TEMP%\\jenkins-home" mkdir "%TEMP%\\jenkins-home"
+                        set "HOME=%TEMP%\\jenkins-home"
                         npm ci
                         npm test -- --watch=false --browsers=ChromeHeadlessCI --code-coverage --reporters=progress,coverage
                     '''
@@ -48,7 +48,7 @@ pipeline {
                 script {
                     def scannerHome = tool 'SonarQubeScanner'
                     withSonarQubeEnv('SonarQube') {
-                        sh "${scannerHome}/bin/sonar-scanner"
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
                     }
                 }
                 timeout(time: 10, unit: 'MINUTES') {
@@ -66,7 +66,7 @@ pipeline {
                         passwordVariable: 'NEXUS_PASSWORD'
                     )
                 ]) {
-                    sh "mvn ${env.MVN_OPTS} -DskipTests deploy"
+                    bat "mvn %MVN_OPTS% -DskipTests deploy"
                 }
             }
         }
@@ -80,20 +80,20 @@ pipeline {
                         passwordVariable: 'NEXUS_PASSWORD'
                     )
                 ]) {
-                    sh '''
-                        echo "$NEXUS_PASSWORD" | docker login ${NEXUS_DOCKER_REGISTRY} -u "$NEXUS_USERNAME" --password-stdin
+                    bat '''
+                        echo %NEXUS_PASSWORD% | docker login %NEXUS_DOCKER_REGISTRY% -u %NEXUS_USERNAME% --password-stdin
 
-                        docker build -t ${NEXUS_DOCKER_REGISTRY}/user-service:${IMAGE_VERSION} ./backend/user-service
-                        docker push ${NEXUS_DOCKER_REGISTRY}/user-service:${IMAGE_VERSION}
+                        docker build -t %NEXUS_DOCKER_REGISTRY%/user-service:%IMAGE_VERSION% ./backend/user-service
+                        docker push %NEXUS_DOCKER_REGISTRY%/user-service:%IMAGE_VERSION%
 
-                        docker build -t ${NEXUS_DOCKER_REGISTRY}/product-service:${IMAGE_VERSION} ./backend/product-service
-                        docker push ${NEXUS_DOCKER_REGISTRY}/product-service:${IMAGE_VERSION}
+                        docker build -t %NEXUS_DOCKER_REGISTRY%/product-service:%IMAGE_VERSION% ./backend/product-service
+                        docker push %NEXUS_DOCKER_REGISTRY%/product-service:%IMAGE_VERSION%
 
-                        docker build -t ${NEXUS_DOCKER_REGISTRY}/media-service:${IMAGE_VERSION} ./backend/media-service
-                        docker push ${NEXUS_DOCKER_REGISTRY}/media-service:${IMAGE_VERSION}
+                        docker build -t %NEXUS_DOCKER_REGISTRY%/media-service:%IMAGE_VERSION% ./backend/media-service
+                        docker push %NEXUS_DOCKER_REGISTRY%/media-service:%IMAGE_VERSION%
 
-                        docker build -t ${NEXUS_DOCKER_REGISTRY}/order-service:${IMAGE_VERSION} ./backend/order-service
-                        docker push ${NEXUS_DOCKER_REGISTRY}/order-service:${IMAGE_VERSION}
+                        docker build -t %NEXUS_DOCKER_REGISTRY%/order-service:%IMAGE_VERSION% ./backend/order-service
+                        docker push %NEXUS_DOCKER_REGISTRY%/order-service:%IMAGE_VERSION%
                     '''
                 }
             }
@@ -103,7 +103,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh '''
+                        bat '''
                             echo "=== Déploiement ==="
                             docker-compose down
                             docker-compose up -d --build
@@ -111,7 +111,7 @@ pipeline {
                     } catch (err) {
                         echo "Déploiement échoué"
                         if (fileExists('docker-compose.yml')) {
-                            sh 'docker-compose up -d'
+                            bat 'docker-compose up -d'
                         }
                         throw err
                     }
